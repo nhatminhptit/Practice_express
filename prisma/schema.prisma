@@ -19,7 +19,7 @@ enum Status {
 
 model Category {
   id Int @id @default(autoincrement())
-  name String 
+  name String
   status Status @default(active)
   products Product[]
 }
@@ -27,7 +27,7 @@ model Category {
 model Product {
   id Int @id @default(autoincrement())
   name String
-  price Int
-  cat Category @relation(fields: [cat_id], references: [id])
-  cat_id Int
+  price Float
+  category_id Int 
+  category Category @relation(fields: [category_id], references: [id])
 }
