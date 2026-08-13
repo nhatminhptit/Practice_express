@@ -31,7 +31,11 @@ export const createCategory = async (req, res) => {
 
 export const getCategories = async (req, res) => {
   try {
-    const categories = await prisma.category.findMany();
+    const { search } = req.query;
+
+    const categories = await prisma.category.findMany({
+      where: search ? { name: { contains: search } } : {},
+    });
 
     res.json(categories);
   } catch (error) {
