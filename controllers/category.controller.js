@@ -43,10 +43,18 @@ export const getCategories = async (req, res) => {
 };
 
 export const updateCategory = async (req, res) => {
-    try {
-        
-    }
-    catch (error) {
+  try {
+    const { id } = req.params;
+    const { name, status } = req.body;
 
-    }
-}
+    const updatedCategory = await prisma.category.update({
+      where: { id: Number(id) },
+      data: { name, status },
+    });
+
+    res.json(updateCategory)
+  } catch (error) {
+    console.log("CHI TIẾT LỖI PRISMA:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
