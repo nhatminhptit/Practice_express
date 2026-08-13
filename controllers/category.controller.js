@@ -31,11 +31,24 @@ export const createCategory = async (req, res) => {
 
 export const getCategories = async (req, res) => {
   try {
-    const search = req.query.search;
-
     const categories = await prisma.category.findMany();
 
     res.json(categories);
+  } catch (error) {
+    console.log("CHI TIẾT LỖI PRISMA:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const category = await prisma.category.findMany({
+      where: { id: Number(id) },
+    });
+
+    res.json(category);
   } catch (error) {
     console.log("CHI TIẾT LỖI PRISMA:", error);
     res.status(500).json({ error: error.message });
@@ -52,7 +65,22 @@ export const updateCategory = async (req, res) => {
       data: { name, status },
     });
 
-    res.json(updateCategory)
+    res.json(updatedCategory);
+  } catch (error) {
+    console.log("CHI TIẾT LỖI PRISMA:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await prisma.category.delete({
+      where: { id: Number(id) },
+    });
+
+    res.json({ message: "Xóa thành công" });
   } catch (error) {
     console.log("CHI TIẾT LỖI PRISMA:", error);
     res.status(500).json({ error: error.message });
