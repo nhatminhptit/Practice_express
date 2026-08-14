@@ -48,9 +48,13 @@ export const getCategory = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const category = await prisma.category.findMany({
+    const category = await prisma.category.findUnique({
       where: { id: Number(id) },
     });
+
+    if (!category) {
+      return res.status(404).json({ error: "Danh mục không tồn tại" });
+    }
 
     res.json(category);
   } catch (error) {
