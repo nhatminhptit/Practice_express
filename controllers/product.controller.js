@@ -32,13 +32,37 @@ export const createProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-    const { search } = req.query;
+    const { search, page = 1, limit = 10 } = req.query;
 
-    const products = await prisma.product.findMany({
-      where: search ? { name: { contains: search } } : {},
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const whereCondition = search ? { name: { contains: search } } : {};
+
+    const [products, totalItems] = await Promise.all([
+      prisma.product.findMany({
+        where: whereCondition,
+        skip: skip,
+        take: limitNumber,
+      }),
+      prisma.product.count({
+        where: whereCondition,
+      }),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limitNumber);
+
+    res.status(200).json({
+      data: products,
+      pagination: {
+        currentPage: pageNumber,
+        itemsPerPage: limitNumber,
+        totalItems: totalItems,
+        totalPages: totalPages,
+      },
     });
-
-    res.status(200).json(products);
   } catch (error) {
     console.log("CHI TIẾT LỖI PRISMA:", error);
     res.status(500).json({ error: error.message });
