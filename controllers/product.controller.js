@@ -1,0 +1,46 @@
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaClient } from "../generated/prisma/client.ts";
+
+const adapter = new PrismaMariaDb({
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
+const prisma = new PrismaClient({ adapter });
+
+export const createProduct = async (req, res) => {
+  try {
+    const { name, price, category_id } = req.body;
+    const product = await prisma.product.create({
+      data: {
+        name,
+        price,
+        category: {
+          connect: { id: category_id },
+        },
+      },
+    });
+    res.status(201).json(product);
+  } catch (error) {
+    console.log("CHI TIẾT LỖI PRISMA:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getProducts = async (req, res) => {
+  try {
+    const { search } = req.query;
+
+    const products = await prisma.product.findMany({
+      where: search ? { name: { contains: search } } : {},
+    });
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.log("CHI TIẾT LỖI PRISMA:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
