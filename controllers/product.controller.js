@@ -60,3 +60,31 @@ export const getProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, price, category_id } = req.body;
+    const updatedProduct = await prisma.product.update({
+      where: { id: Number(id) },
+      data: { name, price, category_id },
+    });
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    console.log("CHI TIẾT LỖI PRISMA:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedProduct = await prisma.product.delete({
+      where: { id: Number(id) },
+    });
+    res.status(200).json(deletedProduct);
+  } catch (error) {
+    console.log("CHI TIẾT LỖI PRISMA:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
